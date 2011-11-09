@@ -1,7 +1,7 @@
-Project name
-============
+sbtsrc
+======
 
-Project description.
+sbt plugin for creating source directories.
 
 License
 -------
