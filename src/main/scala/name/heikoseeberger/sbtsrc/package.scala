@@ -18,7 +18,8 @@
 
 package name.heikoseeberger
 
-import sbt._
+import sbt.{ Configuration, Configurations, Extracted, Project, ProjectReference, SettingKey, State }
+import sbt.complete.Parser
 import sbt.Load.BuildStructure
 import scalaz.{ NonEmptyList, Validation }
 import scalaz.Scalaz._
@@ -29,7 +30,8 @@ package object sbtsrc {
 
   def structure(implicit state: State): BuildStructure = extracted.structure
 
-  def setting[A](key: SettingKey[A],
+  def setting[A](
+    key: SettingKey[A],
     errorMessage: => String,
     reference: ProjectReference,
     configuration: Configuration = Configurations.Compile)(
@@ -38,6 +40,11 @@ package object sbtsrc {
       case Some(a) => a.success
       case None => errorMessage.failNel
     }
+  }
+
+  def booleanOpt(key: String): Parser[(String, Boolean)] = {
+    import sbt.complete.DefaultParsers._
+    (Space ~> key ~ ("=" ~> ("true" | "false"))) map { case (k, v) => k -> v.toBoolean }
   }
 
   type NELString = NonEmptyList[String]

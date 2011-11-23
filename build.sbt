@@ -3,8 +3,6 @@ organization := "name.heikoseeberger.sbtsrc"
 
 name := "sbtsrc"
 
-version := "1.1.0-SNAPSHOT"
-
 sbtPlugin := true
 
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "6.0.3"

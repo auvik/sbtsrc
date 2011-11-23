@@ -17,23 +17,47 @@
 package name.heikoseeberger.sbtsrc
 
 import java.io.File
-import sbt.{ Command, Configuration, Keys, Plugin, ProjectRef, State }
+import sbt.{ Command, Configuration, Keys, Plugin, ProjectRef, Setting, SettingKey, State }
 import sbt.CommandSupport.logger
 import sbt.Configurations.{ Compile, Test }
 import scalaz.{ Failure, Success }
 import scalaz.Scalaz._
 
 object SrcPlugin extends Plugin {
-  override def settings = Seq(Keys.commands += Src.srcCommand)
-}
 
-object Src {
+  override def settings = {
+    import SrcKeys._
+    Seq(
+      withManaged := false,
+      withResources := true,
+      Keys.commands <+= (withManaged, withResources)(srcCommand))
+  }
 
-  def srcCommand: Command = Command.command("src")(srcAction(_))
+  private def srcCommand(withManaged: Boolean, withResources: Boolean): Command = {
+    def act(state: State, args: Seq[(String, Boolean)]) =
+      action(withManaged, withResources, args.toMap)(state)
+    Command("src")(_ => parser)(act)
+  }
 
-  private def srcAction(implicit state: State) = {
-    logger(state).info("About to create source directories for you.")
-    val srcForProjects = for (ref <- structure.allProjectRefs) yield srcForProject(ref)
+  private def parser = {
+    import SrcOpts._
+    val opt = booleanOpt(WithManaged) | booleanOpt(WithResources)
+    opt.*
+  }
+
+  private def action(
+    withManaged: Boolean,
+    withResources: Boolean,
+    args: Map[String, Boolean])(
+      implicit state: State) = {
+    logger(state).info("About to create source directories for your project(s).")
+    val srcForProjects = {
+      import SrcOpts._
+      for (ref <- structure.allProjectRefs) yield srcForProject(
+        ref,
+        args get WithManaged getOrElse withManaged,
+        args get WithResources getOrElse withResources)
+    }
     srcForProjects.sequence[ValidationNELString, Seq[(File, Boolean)]] match {
       case Success(projects) =>
         logger(state).info("Successfully created source directories for %s project(s):" format projects.size)
@@ -48,15 +72,49 @@ object Src {
     }
   }
 
-  private def srcForProject(ref: ProjectRef)(implicit state: State) =
-    (srcDirs(ref, Compile) |@| srcDirs(ref, Test))(createDirectories)
+  private def srcForProject(ref: ProjectRef, withManaged: Boolean, withResources: Boolean)(implicit state: State) = {
+    val compileDirs = dirs(ref, Compile, withManaged, withResources)
+    val testDirs = dirs(ref, Test, withManaged, withResources)
+    (compileDirs |@| testDirs)(createDirs)
+  }
 
-  private def srcDirs(ref: ProjectRef, conf: Configuration)(implicit state: State) =
-    setting(Keys.unmanagedSourceDirectories,
-      "Missing %s source directories for %s!".format(conf, ref.project),
-      ref,
-      conf)
+  private def dirs(
+    ref: ProjectRef,
+    conf: Configuration,
+    withManaged: Boolean,
+    withResources: Boolean)(
+      implicit state: State) =
+    Seq(
+      setting(
+        if (withManaged) Keys.sourceDirectories else Keys.unmanagedSourceDirectories,
+        "Missing %s source directories for %s!".format(conf, ref.project),
+        ref,
+        conf),
+      if (!withResources) Seq.empty.success else setting(
+        if (withManaged) Keys.resourceDirectories else Keys.unmanagedResourceDirectories,
+        "Missing %s resource directories for %s!".format(conf, ref.project),
+        ref,
+        conf)).sequence map { _.flatten }
 
-  private def createDirectories(compileDirs: Seq[File], testDirs: Seq[File]) =
+  private def createDirs(compileDirs: Seq[File], testDirs: Seq[File]) =
     for (directory <- (compileDirs ++ testDirs)) yield directory -> directory.mkdirs()
+
+  object SrcKeys {
+    import SrcOpts._
+
+    val withManaged: SettingKey[Boolean] =
+      SettingKey[Boolean](prefix(WithManaged), "Create managed source directories?")
+
+    val withResources: SettingKey[Boolean] =
+      SettingKey[Boolean](prefix(WithResources), "Create resource directories?")
+
+    private def prefix(key: String) = "src-" + key
+  }
+
+  private object SrcOpts {
+
+    val WithManaged = "with-managed"
+
+    val WithResources = "with-resources"
+  }
 }

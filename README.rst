@@ -1,15 +1,15 @@
 sbtsrc
 ======
 
-The missing plugin for sbt. Adds the *src* command for creating source directories.
+The missing plugin for sbt. Adds the *src* command for creating source directories. This optionally includes resource directories and managed directories.
 
 Installing sbtsrc
 -----------------
 
-- To install this plugin, either use a local or the global plugin definition (for details about sbt plugins see the `sbt documentation`_):
+- You probably want to install this plugin as a global plugin, but of course you could also go for a local one. For details about sbt plugins see the `sbt documentation`_:
 
-  - Local plugins are defined in a *plugins.sbt* file in the *project/* folder of your project
   - Global plugin are defined in a *plugins.sbt* file in the *~/.sbt/plugins/* directory
+  - Local plugins are defined in a *plugins.sbt* file in the *project/* folder of your project
 
 - Just add the below lines to your plugin definition, paying attention to the blank line:
 
@@ -17,7 +17,7 @@ Installing sbtsrc
   
   resolvers += Resolver.url("heikoseeberger", new java.net.URL("http://hseeberger.github.com/releases"))(Resolver.ivyStylePatterns)
   
-  addSbtPlugin("name.heikoseeberger.sbtsrc" % "sbtsrc" % "1.0.0")
+  addSbtPlugin("name.heikoseeberger.sbtsrc" % "sbtsrc" % "1.1.0")
 
 Using sbtsrc
 ------------
@@ -34,6 +34,33 @@ In order to create source directories for your project, just execute the *src* c
   [info] /Users/heiko/tmp/test/src/test/scala was created.
   [info] /Users/heiko/tmp/test/src/test/java was created.
   </code></pre>
+
+Configuring sbtsrc
+------------------
+
+There are two ways to configure the creation of the source directories. First you can use command options and take advantage of sbt's excellent auto complete feature. Second you can use sbt settings to persist your configuration in *build.sbt* or the like. Please notice that there are defaults for the sbt settings and command options will override sbt settings.
+
+Available command options are:
+
+- *with-managed*: *true* or *false* => Create managed source directories?
+- *with-resources* : *true* or *false* => Create resource directories?
+
+Example (within sbt session):
+
+::
+
+  > src with-managed=true with-resources=false
+
+Available settings are:
+
+- *SrcKeys.withManaged: *true* or *false* (default) => Create managed source directories?
+- *SrcKeys.withResources: *true* (default) or *false* => Create resource directories?
+
+Example (within sbt session):
+
+::
+
+  > set SrcKeys.withResources := false
 
 Contribution policy
 -------------------
