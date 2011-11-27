@@ -56,8 +56,8 @@ Example (within sbt session):
 
 Available settings are:
 
-- *SrcKeys.withManaged: *true* or *false* (default) => Create managed source directories?
-- *SrcKeys.withResources: *true* (default) or *false* => Create resource directories?
+- *SrcKeys.withManaged*: *true* or *false* (default) => Create managed source directories?
+- *SrcKeys.withResources*: *true* (default) or *false* => Create resource directories?
 
 Example (within sbt session):
 
