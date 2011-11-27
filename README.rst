@@ -3,6 +3,7 @@ sbtsrc
 
 The missing plugin for sbt. Adds the *src* command for creating source directories. This optionally includes resource directories and managed directories.
 
+
 Installing sbtsrc
 -----------------
 
@@ -19,6 +20,7 @@ Installing sbtsrc
   
   addSbtPlugin("name.heikoseeberger.sbtsrc" % "sbtsrc" % "1.1.0")
 
+
 Using sbtsrc
 ------------
 
@@ -34,6 +36,7 @@ In order to create source directories for your project, just execute the *src* c
   [info] /Users/heiko/tmp/test/src/test/scala was created.
   [info] /Users/heiko/tmp/test/src/test/java was created.
   </code></pre>
+
 
 Configuring sbtsrc
 ------------------
@@ -62,10 +65,18 @@ Example (within sbt session):
 
   > set SrcKeys.withResources := false
 
+
+Mailing list
+------------
+
+Please use the `sbt mailing list`_ and prefix the subject with "[sbtsrc]".
+
+
 Contribution policy
 -------------------
 
 Contributions via GitHub pull requests are gladly accepted from their original author. Along with any pull requests, please state that the contribution is your original work and that you license the work to the groll project under the project's open source license.
+
 
 License
 -------
@@ -73,4 +84,5 @@ License
 This code is open source software licensed under the `Apache 2.0 License`_. Feel free to use it accordingly.
 
 .. _`sbt documentation`: https://github.com/harrah/xsbt/wiki/Plugins
+.. _`sbt mailing list`: mailto:simple-build-tool@googlegroups.com
 .. _`Apache 2.0 License`: http://www.apache.org/licenses/LICENSE-2.0.html
