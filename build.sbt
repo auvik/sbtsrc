@@ -19,3 +19,5 @@ publishTo <<= (version) { version =>
 }
 
 publishMavenStyle := false
+
+seq(scalariformSettings: _*)
