@@ -1,7 +1,5 @@
 /*
- * Copyright 2011 Typesafe Inc.
- * 
- * This work is based on the original contribution of WeigleWilczek.
+ * Copyright 2011 Heiko Seeberger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
